@@ -1,4 +1,4 @@
-from utils import load_data, load_template, adicionar_anotacao
+from utils import load_data, load_template, adicionar_anotacao, build_response
 import urllib.parse
 
 def index(request):
@@ -16,12 +16,14 @@ def index(request):
         # Dica: use o método split da string e a função unquote_plus
         for chave_valor in corpo.split('&'):
             # AQUI É COM VOCÊ
-            for lista in chave_valor.split('='):
-                chave = lista[0]
-                valor = lista[1]
-                valor = urllib.parse.unquote_plus(valor)
-                params[chave] = valor
-                adicionar_anotacao(valor)
+            lista = chave_valor.split('=')
+            chave = lista[0]
+            valor = lista[1]
+            valor = urllib.parse.unquote_plus(valor)
+            params[chave] = valor
+        print(params)
+        adicionar_anotacao(params)
+        return build_response(code=303, reason='See Other', headers='Location: /')
     # O RESTO DO CÓDIGO DA FUNÇÃO index CONTINUA DAQUI PARA BAIXO...
             
     # Cria uma lista de <li>'s para cada anotação
@@ -33,4 +35,5 @@ def index(request):
     ]
     notes = '\n'.join(notes_li)
 
-    return load_template('index.html').format(notes=notes).encode()
+    body = load_template('index.html').format(notes=notes)
+    return build_response(body=body)
